@@ -1,0 +1,16 @@
+{
+  "name": "WAssist Node 1",
+  "version": "__VERSION__",
+  "home_assistant_domain": "esphome",
+  "funding_url": "https://github.com/jfpuetz/wassist",
+  "new_install_prompt_erase": true,
+  "builds": [
+    {
+      "chipFamily": "ESP32-S3",
+      "improv": true,
+      "parts": [
+        { "path": "wassist-node1.factory.bin", "offset": 0 }
+      ]
+    }
+  ]
+}

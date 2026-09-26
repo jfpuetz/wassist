@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WAssist Installer</title>
+  <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+  <style>
+    :root {
+      --bg: #f6f7f9; --card: #ffffff; --text: #1d2330; --muted: #5b6475;
+      --accent: #2563eb; --warn-bg: #fff7e6; --warn-border: #f0b429; --border: #e3e6eb;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #111418; --card: #1a1f26; --text: #e6e9ef; --muted: #9aa3b2;
+        --accent: #60a5fa; --warn-bg: #2a2212; --warn-border: #b7862a; --border: #2a313b;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    main { max-width: 640px; margin: 0 auto; padding: 40px 16px 64px; }
+    h1 { font-size: 1.8rem; margin: 0 0 4px; }
+    .version { color: var(--muted); font-size: .9rem; margin: 0 0 28px; }
+    .card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+      padding: 24px; margin-bottom: 20px;
+    }
+    .card h2 { font-size: 1.1rem; margin: 0 0 12px; }
+    ol { margin: 0; padding-left: 1.3em; }
+    li { margin: 6px 0; }
+    .warn {
+      background: var(--warn-bg); border-left: 4px solid var(--warn-border);
+      border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;
+    }
+    .install { text-align: center; padding: 32px 24px; }
+    esp-web-install-button button[slot="activate"] {
+      font: inherit; font-weight: 600; font-size: 1.05rem; color: #fff;
+      background: var(--accent); border: 0; border-radius: 8px;
+      padding: 12px 28px; cursor: pointer;
+    }
+    .unsupported { color: var(--muted); }
+    code { font-size: .92em; }
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>WAssist Installer</h1>
+    <p class="version">Firmware für WAssist Node 1 · Version __VERSION__</p>
+
+    <div class="warn">
+      <strong>Vor dem Anstecken:</strong> den 5-V-Logikwandler <code>-U8</code> (MP1584EN) trennen.
+      USB und 5V-Pin dürfen das DevKit nicht gleichzeitig speisen.
+    </div>
+
+    <div class="card install">
+      <esp-web-install-button manifest="manifest.json">
+        <button slot="activate">Firmware installieren</button>
+        <span slot="unsupported" class="unsupported">
+          Dein Browser unterstützt kein Web-Serial. Bitte Chrome oder Edge am Desktop verwenden.
+        </span>
+        <span slot="not-allowed" class="unsupported">
+          Web-Serial braucht eine sichere Verbindung (https).
+        </span>
+      </esp-web-install-button>
+    </div>
+
+    <div class="card">
+      <h2>So geht's</h2>
+      <ol>
+        <li>ESP32-S3 am Port <strong>„USB“</strong> anstecken (nicht „UART/COM“).</li>
+        <li>„Firmware installieren“ klicken, den Port wählen und „Install“ bestätigen.</li>
+        <li>Wird kein Port angeboten: <strong>BOOT</strong> gedrückt halten, kurz <strong>RESET</strong> tippen, BOOT loslassen – dann erneut versuchen.</li>
+        <li>Nach dem Flashen fragt die Seite direkt nach dem WLAN (Improv).</li>
+        <li>Home Assistant findet den Node danach automatisch unter <em>Einstellungen → Geräte &amp; Dienste</em>.</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h2>WLAN später ändern</h2>
+      <p style="margin:0">Findet der Node sein WLAN nicht, öffnet er den Hotspot <strong>„WAssist Node 1 Setup“</strong>.
+      Mit dem Handy verbinden und auf der Einrichtungsseite (sonst <code>http://192.168.4.1</code>) das neue WLAN eintragen.</p>
+    </div>
+
+    <p class="version">Quellcode: <a href="https://github.com/jfpuetz/wassist">github.com/jfpuetz/wassist</a></p>
+  </main>
+</body>
+</html>

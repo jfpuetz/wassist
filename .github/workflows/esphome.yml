@@ -6,6 +6,13 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -35,3 +42,46 @@ jobs:
 
       - name: Compile firmware
         run: esphome compile esphome/wassist-node1.yaml
+
+      # Webinstaller: Firmware + Manifest + Installationsseite zusammenstellen
+      - name: Assemble web installer
+        run: |
+          set -euo pipefail
+          FACTORY=$(find esphome/.esphome/build/wassist-node1 -name 'firmware.factory.bin' | head -n1)
+          OTA=$(find esphome/.esphome/build/wassist-node1 -name 'firmware.ota.bin' | head -n1)
+          test -n "$FACTORY" || { echo "firmware.factory.bin nicht gefunden"; exit 1; }
+          mkdir -p site
+          cp web/index.html site/
+          cp "$FACTORY" site/wassist-node1.factory.bin
+          if [ -n "$OTA" ]; then cp "$OTA" site/wassist-node1.ota.bin; fi
+          VERSION="$(date -u +%Y.%m.%d)-${GITHUB_SHA::7}"
+          sed "s/__VERSION__/${VERSION}/" web/manifest.json > site/manifest.json
+          sed -i "s/__VERSION__/${VERSION}/" site/index.html
+          ls -la site
+
+      - name: Upload firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: wassist-node1-firmware
+          path: site/*.bin
+
+      - name: Upload Pages artifact
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

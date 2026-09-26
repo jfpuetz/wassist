@@ -29,7 +29,8 @@ esphome/
     voice.yaml              # Wake Word + Voice Assistant
     led.yaml                # LED-Streifen + Statusfarben
   components/husb238/       # eigene ESPHome-Komponente (C++), liest PD-Status
-.github/workflows/          # prüft und kompiliert bei jedem Push
+.github/workflows/          # prüft, kompiliert und veröffentlicht den Webinstaller
+web/                        # Installationsseite (ESP Web Tools) + Manifest
 ```
 
 ## Einrichtung (Windows)
@@ -59,7 +60,14 @@ esphome/
 5. **USB-Treiber:** Der „USB“-Port des DevKit (native USB) braucht unter Windows 10/11 keinen Treiber.
    Der „UART“/„COM“-Port nutzt je nach Revision einen CP210x- oder CH343-Chip – falls kein COM-Port erscheint, den passenden Treiber installieren.
 
-## Erstes Flashen
+## Flashen über den Browser (ohne Installation)
+
+Wie bei WLED: **<https://jfpuetz.github.io/wassist/>** in Chrome oder Edge öffnen →
+„Firmware installieren“ → Port wählen. Direkt danach fragt die Seite das WLAN ab.
+Die Seite wird bei jedem Push auf `main` von GitHub Actions neu gebaut und zeigt immer die aktuelle Firmware.
+Die fertigen `.bin`-Dateien liegen außerdem bei jedem Actions-Lauf als Artefakt zum Download.
+
+## Erstes Flashen (lokal, für Entwicklung)
 
 > ⚠️ **Vor dem Anstecken per USB `-U8` (MP1584EN, 5-V-Logik) trennen.**
 > USB, 5V-Pin und 3V3-Pin des DevKit dürfen laut Espressif nicht gleichzeitig speisen.
