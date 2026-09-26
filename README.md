@@ -123,6 +123,14 @@ Die Versionsnummer (`JJJJ.MM.TT-<commit>`) setzt der GitHub-Build. Lokal gebaute
 dann meldet der Node immer ein Update, bis wieder eine GitHub-Version drauf ist.
 Für den Download braucht der Node HTTPS-Zugang ins Internet (github.io).
 
+## Hardware-Tests
+
+- **Lautsprecher:** Button „Testton“ (Diagnose) spielt eine kurze Tonfolge.
+- **Mikrofon (Echo-Test):** Schalter „Echo-Test“ einschalten → Wake Word sagen → der Node nimmt 5 s auf
+  (LEDs blau) und spielt sie sofort ab (LEDs grün). Nichts geht an Home Assistant.
+  Alternativ Button „Echo-Test starten“ ohne Wake Word. Danach Schalter wieder aus.
+- **LEDs:** „Status-LED“ und „Board-LED“ (Onboard-LED an GPIO48).
+
 ## Stromversorgung
 
 Die HUSB238-Jumper bleiben im **Werkszustand (5 V / 1 A)** – so startet der Node an jedem USB-Netzteil.

@@ -15,8 +15,46 @@ micro_wake_word:
     - model: hey_mycroft
       id: hey_mycroft
   on_wake_word_detected:
-    - voice_assistant.start:
-        wake_word: !lambda return wake_word;
+    - if:
+        condition:
+          switch.is_on: echo_mode
+        then:
+          # Echo-Test: aufnehmen und wiedergeben statt an Home Assistant senden
+          - script.execute: run_echo_test
+        else:
+          - voice_assistant.start:
+              wake_word: !lambda return wake_word;
+
+# Echo-Test (eigene Komponente): nimmt nach dem Wake Word auf und spielt es direkt wieder ab.
+echo_test:
+  id: echo
+  microphone: mic
+  speaker: amp
+  duration: 5s
+  gain_factor: 4
+  on_record_start:
+    - script.execute: led_listening
+  on_playback_start:
+    - script.execute: led_speaking
+  on_finished:
+    - script.execute: led_idle
+    - if:
+        condition:
+          switch.is_on: wake_word_enabled
+        then:
+          - micro_wake_word.start:
+
+script:
+  - id: run_echo_test
+    mode: single
+    then:
+      - micro_wake_word.stop:
+      - wait_until:
+          condition:
+            not:
+              micro_wake_word.is_running:
+          timeout: 2s
+      - echo_test.start: echo
 
 voice_assistant:
   id: va
@@ -51,7 +89,23 @@ voice_assistant:
     - micro_wake_word.stop:
     - script.execute: led_error
 
+button:
+  - platform: template
+    name: Echo-Test starten
+    icon: mdi:record-rec
+    entity_category: diagnostic
+    on_press:
+      - script.execute: run_echo_test
+
 switch:
+  - platform: template
+    name: Echo-Test
+    id: echo_mode
+    icon: mdi:account-voice
+    optimistic: true
+    restore_mode: ALWAYS_OFF
+    entity_category: diagnostic
+
   - platform: template
     name: Wake Word aktiv
     id: wake_word_enabled

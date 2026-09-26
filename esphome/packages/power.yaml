@@ -6,7 +6,7 @@ external_components:
   - source:
       type: local
       path: components
-    components: [husb238]
+    components: [husb238, echo_test]
 
 sensor:
   # -U2 HUSB238: startet mit der Jumper-Einstellung (Werk: 5 V / 1 A), dann fordert
