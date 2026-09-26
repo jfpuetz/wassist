@@ -69,8 +69,11 @@ Die fertigen `.bin`-Dateien liegen außerdem bei jedem Actions-Lauf als Artefakt
 
 ## Erstes Flashen (lokal, für Entwicklung)
 
-> ⚠️ **Vor dem Anstecken per USB `-U8` (MP1584EN, 5-V-Logik) trennen.**
-> USB, 5V-Pin und 3V3-Pin des DevKit dürfen laut Espressif nicht gleichzeitig speisen.
+> ⚠️ **Nie PC-USB und USB-PD-Netzteil gleichzeitig anstecken.**
+> USB-Port und 5V-Pin des DevKit dürfen laut Espressif nicht gleichzeitig speisen (-U8 liegt am 5V-Pin).
+> Zum Flashen das PD-Netzteil abziehen, dann reicht das USB-Kabel allein – nichts abklemmen nötig.
+> Ohne PD-Netzteil meldet der HUSB238 „nicht verbunden“ und Lautsprecher/LEDs bleiben aus (normal).
+> Dauerhafte Lösung: Schottky-Diode (1N5819/SS34) zwischen -U8-Ausgang und 5V-Pin, -U8 dann auf ~5,3 V.
 
 ```powershell
 cd wassist
