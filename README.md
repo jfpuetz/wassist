@@ -10,6 +10,7 @@ Spracherkennung und Antwort übernimmt Home Assistant Assist.
 | Mikrofon | INMP441 (-U4) | I2S0: BCLK GPIO4, WS GPIO5, SD GPIO6 |
 | Verstärker | MAX98357A (-U3) + 4-Ω-Lautsprecher | I2S1: BCLK GPIO15, LRC GPIO16, DIN GPIO17 |
 | Status-LEDs | WS2812B-Streifen | GPIO38 über -R1 |
+| Lautstärketasten | 2 Taster gegen GND (interner Pull-up) | GPIO10 = lauter, GPIO11 = leiser |
 | USB-PD | HUSB238 (-U2), 0x08 | I2C GPIO8/9 |
 | Strommessung | INA219 (-U5 0x40 9-V-Schiene, -U6 0x41 LED-Zweig) | I2C GPIO8/9 |
 
@@ -130,6 +131,12 @@ Für den Download braucht der Node HTTPS-Zugang ins Internet (github.io).
   (LEDs blau) und spielt sie sofort ab (LEDs grün). Nichts geht an Home Assistant.
   Alternativ Button „Echo-Test starten“ ohne Wake Word. Danach Schalter wieder aus.
 - **LEDs:** „Status-LED“ und „Board-LED“ (Onboard-LED an GPIO48).
+
+## Lautstärke
+
+Regler „Lautstärke“ (0–100 %, bleibt nach Neustart erhalten) und Schalter „Stumm“ in HA und Weboberfläche.
+Tasten: kurz drücken = ±5 %, halten = wiederholt, beim Loslassen kurzer Piep in der neuen Lautstärke.
+„Lauter“ hebt eine Stummschaltung auf.
 
 ## Stromversorgung
 

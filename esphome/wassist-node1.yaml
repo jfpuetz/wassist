@@ -26,6 +26,9 @@ substitutions:
   # Onboard-RGB-LED: GPIO48 (DevKitC-1 v1.0 / YD-ESP32-S3-Nachbau). Beim YD-Layout erst
   # nach Schließen der Lötbrücke "RGB" angeschlossen. Lötbrücke "IN-OUT" offen lassen.
   board_led_pin: GPIO48
+  # Lautstärketasten: Taster gegen GND, interner Pull-up (keine Widerstände nötig)
+  btn_vol_up_pin: GPIO10
+  btn_vol_down_pin: GPIO11
 
   # --- LED-Streifen ---
   led_count: "100"

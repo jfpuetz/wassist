@@ -37,6 +37,101 @@ rtttl:
   speaker: amp
   gain: 50%
 
+# --- Lautstärke ---
+# Software-Lautstärke des I2S-Lautsprechers (dB-Kurve), gilt für Sprachausgabe, Testton und Echo-Test.
+number:
+  - platform: template
+    id: volume
+    name: Lautstärke
+    icon: mdi:volume-high
+    unit_of_measurement: "%"
+    min_value: 0
+    max_value: 100
+    step: 5
+    mode: slider
+    optimistic: true
+    restore_value: true
+    initial_value: 50
+    on_value:
+      - lambda: id(amp).set_volume(x / 100.0f);
+
+switch:
+  - platform: template
+    id: mute
+    name: Stumm
+    icon: mdi:volume-off
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+    turn_on_action:
+      - lambda: id(amp).set_mute_state(true);
+    turn_off_action:
+      - lambda: id(amp).set_mute_state(false);
+
+# Physische Tasten: kurz = ±5 %, halten = wiederholen, beim Loslassen kurzer Piepton
+binary_sensor:
+  - platform: gpio
+    id: btn_vol_up
+    name: Taste Lauter
+    entity_category: diagnostic
+    pin:
+      number: ${btn_vol_up_pin}
+      mode:
+        input: true
+        pullup: true
+      inverted: true
+    filters:
+      - delayed_on_off: 20ms
+    on_press:
+      - switch.turn_off: mute
+      - while:
+          condition:
+            binary_sensor.is_on: btn_vol_up
+          then:
+            - number.increment:
+                id: volume
+                cycle: false
+            - delay: 300ms
+    on_release:
+      - script.execute: volume_feedback
+
+  - platform: gpio
+    id: btn_vol_down
+    name: Taste Leiser
+    entity_category: diagnostic
+    pin:
+      number: ${btn_vol_down_pin}
+      mode:
+        input: true
+        pullup: true
+      inverted: true
+    filters:
+      - delayed_on_off: 20ms
+    on_press:
+      - while:
+          condition:
+            binary_sensor.is_on: btn_vol_down
+          then:
+            - number.decrement:
+                id: volume
+                cycle: false
+            - delay: 300ms
+    on_release:
+      - script.execute: volume_feedback
+
+script:
+  - id: volume_feedback
+    mode: restart
+    then:
+      # Kein Piep, wenn gerade gesprochen oder abgespielt wird
+      - if:
+          condition:
+            and:
+              - not:
+                  voice_assistant.is_running:
+              - lambda: return !id(echo).is_busy();
+          then:
+            - rtttl.play: "vol:d=16,o=6,b=200:c"
+
 button:
   - platform: template
     name: Testton
