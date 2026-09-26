@@ -21,9 +21,6 @@ jobs:
       - name: Install ESPHome
         run: pip install -r requirements.txt
 
-      - name: Dummy secrets
-        run: cp esphome/secrets.yaml.example esphome/secrets.yaml
-
       - name: Validate config
         run: esphome config esphome/wassist-node1.yaml
 

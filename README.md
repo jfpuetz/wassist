@@ -29,7 +29,6 @@ esphome/
     voice.yaml              # Wake Word + Voice Assistant
     led.yaml                # LED-Streifen + Statusfarben
   components/husb238/       # eigene ESPHome-Komponente (C++), liest PD-Status
-  secrets.yaml.example      # Vorlage für WLAN/API-Schlüssel
 .github/workflows/          # prüft und kompiliert bei jedem Push
 ```
 
@@ -57,12 +56,7 @@ esphome/
    das integrierte Terminal aktiviert sie dann selbst.
 4. **VS-Code-Erweiterungen:**
    VS Code schlägt die empfohlenen Erweiterungen vor (ESPHome, YAML, C++, GitLens) → installieren.
-5. **Secrets anlegen:** `esphome/secrets.yaml.example` nach `esphome/secrets.yaml` kopieren und ausfüllen.
-   API-Schlüssel erzeugen:
-   ```powershell
-   py -c "import secrets,base64;print(base64.b64encode(secrets.token_bytes(32)).decode())"
-   ```
-6. **USB-Treiber:** Der „USB“-Port des DevKit (native USB) braucht unter Windows 10/11 keinen Treiber.
+5. **USB-Treiber:** Der „USB“-Port des DevKit (native USB) braucht unter Windows 10/11 keinen Treiber.
    Der „UART“/„COM“-Port nutzt je nach Revision einen CP210x- oder CH343-Chip – falls kein COM-Port erscheint, den passenden Treiber installieren.
 
 ## Erstes Flashen
@@ -84,9 +78,31 @@ Im Log nach dem Start prüfen:
 - `husb238`: „Source offers 9 V @ … A“ und „Contract: 9 V / 3.00 A“
 - keine Fehlermeldungen von `i2s_audio`
 
+## WLAN einrichten (ohne secrets.yaml, wie bei WLED)
+
+Die Firmware enthält keine Zugangsdaten. Nach dem ersten Flashen:
+
+1. Der Node öffnet den Hotspot **„WAssist Node 1 Setup“** (offen, ohne Passwort).
+2. Mit dem Handy verbinden – die Einrichtungsseite öffnet sich automatisch, sonst <http://192.168.4.1>.
+3. Heim-WLAN auswählen, Passwort eingeben, speichern. Der Node startet neu und verbindet sich.
+
+Alternativ direkt nach dem Flashen per USB: <https://web.esphome.io> in Chrome/Edge öffnen →
+„Connect“ → „Configure Wi-Fi“ (Improv Serial).
+
+Findet der Node sein gespeichertes WLAN später 30 s lang nicht, öffnet er den Hotspot erneut.
+
 ## In Home Assistant einbinden
 
-Einstellungen → Geräte & Dienste → der Node erscheint als „ESPHome“ → Hinzufügen → API-Schlüssel aus `secrets.yaml` eingeben.
+Einstellungen → Geräte & Dienste → der Node erscheint unter „Entdeckt“ als ESPHome-Gerät → Hinzufügen.
+Home Assistant erzeugt dabei selbst den API-Schlüssel und überträgt ihn auf den Node; ab dann
+sind nur noch verschlüsselte Verbindungen möglich. Kein Schlüssel muss abgetippt werden.
+
+Neu einrichten (anderes WLAN, anderes HA): Button **„Werkseinstellungen“** am Gerät in HA –
+löscht WLAN-Daten und API-Schlüssel, danach erscheint wieder der Setup-Hotspot.
+
+> **Hinweis OTA:** Updates per WLAN sind ohne Passwort möglich (jedes Gerät im selben Netz könnte flashen).
+> Wer das absichern will, setzt in `esphome/packages/base.yaml` unter `ota:` ein `password:`.
+
 Danach unter Einstellungen → Sprachassistenten eine Assist-Pipeline wählen. Wake Word: „Okay Nabu“.
 
 ## Offene Punkte (siehe Schaltplan-Notizen)

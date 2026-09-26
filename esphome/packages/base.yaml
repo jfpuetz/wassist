@@ -17,22 +17,33 @@ psram:
 logger:
   level: DEBUG
 
+# --- Einrichtung ohne secrets.yaml (wie bei WLED) ---
+# 1. Ohne gespeichertes WLAN öffnet der Node den Hotspot "${friendly_name} Setup".
+#    Handy verbinden -> Einrichtungsseite öffnet sich (sonst http://192.168.4.1)
+#    -> WLAN wählen, Passwort eingeben. Alternativ per USB über https://web.esphome.io (Improv).
+# 2. Home Assistant findet den Node automatisch. Beim Hinzufügen erzeugt HA den
+#    API-Schlüssel und überträgt ihn; danach sind nur noch verschlüsselte Verbindungen möglich.
+# Zurücksetzen: Button "Werkseinstellungen" in HA (löscht WLAN und API-Schlüssel).
+
 api:
-  encryption:
-    key: !secret api_encryption_key
+  encryption: {}   # Schlüssel wird von Home Assistant bei der Einbindung gesetzt
 
 ota:
   - platform: esphome
-    password: !secret ota_password
+    # Ohne Passwort: jedes Gerät im selben Netz könnte Firmware aufspielen.
+    # Für mehr Schutz hier ein Passwort setzen (dann auch in HA/CLI verwenden).
 
 wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
   ap:
-    ssid: "${node_name} Fallback"
-    password: !secret fallback_ap_password
+    ssid: "${friendly_name} Setup"
+    # Hotspot erst öffnen, wenn das gespeicherte WLAN 30 s nicht erreichbar ist
+    ap_timeout: 30s
+  # WLAN-Energiesparen aus: stabilere Audio-Streams
+  power_save_mode: none
 
 captive_portal:
+
+improv_serial:
 
 i2c:
   id: i2c_bus
@@ -58,4 +69,7 @@ text_sensor:
 button:
   - platform: restart
     name: Neustart
+    entity_category: config
+  - platform: factory_reset
+    name: Werkseinstellungen
     entity_category: config
