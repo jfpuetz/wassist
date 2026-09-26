@@ -9,22 +9,41 @@ external_components:
     components: [husb238]
 
 sensor:
-  # -U2 HUSB238: ausgehandelter PD-Vertrag (nur lesend – Spannung kommt per Jumper)
+  # -U2 HUSB238: startet mit der Jumper-Einstellung (Werk: 5 V / 1 A), dann fordert
+  # die Firmware das beste Angebot des Netzteils bis pd_max_voltage an.
   - platform: husb238
+    id: pd
     address: 0x08
     update_interval: 30s
+    auto_select: true
+    max_voltage: ${pd_max_voltage}
     voltage:
       name: USB-PD Spannung
       entity_category: diagnostic
     current:
       name: USB-PD Strom (Vertrag)
       entity_category: diagnostic
+    power:
+      id: pd_power
+      name: USB-PD Leistung
+      entity_category: diagnostic
+      on_value:
+        - lambda: |-
+            const bool weak = x < ${pd_weak_below_w};
+            if (weak == id(pd_weak).state && id(pd_weak).has_state())
+              return;
+            id(pd_weak).publish_state(weak);
+            const float cap = weak ? ${led_cap_weak} : ${led_cap_normal};
+            auto *out = static_cast<light::AddressableLight *>(id(status_led)->get_output());
+            out->set_correction(cap, cap, cap);
+            ESP_LOGI("power", "Netzteil %.0f W -> %s, LED-Obergrenze %.0f %%",
+                     x, weak ? "schwach" : "ok", cap * 100.0f);
 
   # -U5 INA219: Gesamtstrom 9-V-Schiene (beide Wandler-Eingänge)
   - platform: ina219
     address: 0x40
     shunt_resistance: ${ina_shunt_ohm}
-    max_voltage: 16V
+    max_voltage: 26V
     max_current: ${ina_max_current}
     update_interval: 5s
     bus_voltage:
@@ -38,7 +57,7 @@ sensor:
   - platform: ina219
     address: 0x41
     shunt_resistance: ${ina_shunt_ohm}
-    max_voltage: 16V
+    max_voltage: 26V
     max_current: ${ina_max_current}
     update_interval: 5s
     bus_voltage:
@@ -48,3 +67,10 @@ sensor:
       name: LED Strom
     power:
       name: LED Leistung
+
+binary_sensor:
+  - platform: template
+    id: pd_weak
+    name: Schwaches Netzteil
+    device_class: problem
+    entity_category: diagnostic

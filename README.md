@@ -108,6 +108,19 @@ Alternativ direkt nach dem Flashen per USB: <https://web.esphome.io> in Chrome/E
 
 Findet der Node sein gespeichertes WLAN später 30 s lang nicht, öffnet er den Hotspot erneut.
 
+## Stromversorgung
+
+Die HUSB238-Jumper bleiben im **Werkszustand (5 V / 1 A)** – so startet der Node an jedem USB-Netzteil.
+Nach dem Start liest die Firmware die Angebote des Netzteils und fordert per I2C das mit der meisten
+Leistung an, höchstens `pd_max_voltage` (in `wassist-node1.yaml`).
+
+| Netzteil | Ergebnis | LED-Obergrenze |
+|---|---|---|
+| USB-PD, ≥ 20 W | z. B. 9 V / 3 A oder 12 V / 3 A | 20 % (`led_cap_normal`) |
+| reines 5-V-USB oder schwaches PD | 5 V, „Schwaches Netzteil“ = an | 5 % (`led_cap_weak`) |
+
+Die Obergrenze wirkt unabhängig von der Helligkeit in Home Assistant. Beim Start gilt immer der Sparwert.
+
 ## In Home Assistant einbinden
 
 Einstellungen → Geräte & Dienste → der Node erscheint unter „Entdeckt“ als ESPHome-Gerät → Hinzufügen.
@@ -124,11 +137,12 @@ Danach unter Einstellungen → Sprachassistenten eine Assist-Pipeline wählen. W
 
 ## Offene Punkte (siehe Schaltplan-Notizen)
 
-- [ ] INA219: LED-Strom < 3 A halten (aktuell per Software auf 40 % Helligkeit begrenzt) **oder** Shunt tauschen
+- [x] INA219-Messbereich: LED-Helligkeit hart auf 20 % (≈1,2 A) bzw. 5 % bei schwachem Netzteil gedeckelt
+- [ ] -C1/-C2 Spannungsfestigkeit prüfen → bei ≥ 25 V `pd_max_voltage` auf 20V anheben
 - [ ] WS2812B-Pegel: -U7 auf 4,5 V **oder** 74AHCT125
 - [ ] -U3 SD an einen GPIO → Software-Mute
 - [ ] MP1584EN-Reserve für ESP32 + Endstufe prüfen
-- [ ] HUSB238: Spannung per I2C wählen (aktuell nur lesend, Jumper bestimmt 9 V)
+- [x] HUSB238: Spannung per I2C – Firmware wählt das leistungsstärkste Angebot bis `pd_max_voltage`
 
 ## Lizenz
 

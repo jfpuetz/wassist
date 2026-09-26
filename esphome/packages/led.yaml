@@ -9,11 +9,12 @@ light:
     num_leds: ${led_count}
     chipset: ws2812
     rgb_order: GRB
-    # Hardware-Obergrenze für den Strom, unabhängig von der Helligkeit in HA
+    # Harte Obergrenze, unabhängig von der Helligkeit in HA. Startwert = Sparmodus;
+    # power.yaml hebt sie an, sobald das Netzteil genug Leistung liefert.
     color_correct:
-      - ${led_max_brightness}
-      - ${led_max_brightness}
-      - ${led_max_brightness}
+      - ${led_cap_weak}
+      - ${led_cap_weak}
+      - ${led_cap_weak}
     default_transition_length: 200ms
     restore_mode: ALWAYS_OFF
     effects:

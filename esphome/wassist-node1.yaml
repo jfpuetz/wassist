@@ -23,9 +23,18 @@ substitutions:
 
   # --- LED-Streifen ---
   led_count: "100"
-  # Strombegrenzung per Software: 100 LEDs x 60 mA = 6 A bei Vollweiß.
-  # INA219 (-U6) misst mit 0,1-Ohm-Shunt nur bis ca. 3,2 A, daher max. 40 %.
-  led_max_brightness: 40%
+  # Harte Helligkeitsobergrenze (unabhängig von HA). Die LEDs sind nur dezente
+  # Statusanzeige – 100 LEDs x 60 mA = 6 A bei Vollweiß wären weit mehr als nötig.
+  led_cap_normal: "0.20"   # 20 % -> max. ca. 1,2 A, bei ausreichendem Netzteil
+  led_cap_weak: "0.05"     #  5 % -> max. ca. 0,3 A, beim Start und bei schwachem Netzteil
+
+  # --- USB-PD ---
+  # Der Node fordert das Netzteil-Angebot mit der meisten Leistung an, höchstens pd_max_voltage.
+  # Grenze durch die Bauteile: MP1584EN 28 V, INA219 26 V, -C8..-C11 35 V.
+  # 12 V, bis die Spannungsfestigkeit von -C1/-C2 geprüft ist – bei >= 25 V auf 20V anheben.
+  pd_max_voltage: 12V
+  # Unter dieser Leistung gilt das Netzteil als schwach (jedes reine 5-V-Netzteil liegt darunter).
+  pd_weak_below_w: "20"
 
   # --- INA219-Shunts (CJMCU-219 ab Werk 0,1 Ohm) ---
   ina_shunt_ohm: 0.1 ohm
