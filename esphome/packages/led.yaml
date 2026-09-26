@@ -9,6 +9,10 @@ light:
     num_leds: ${led_count}
     chipset: ws2812
     rgb_order: GRB
+    # RMT-Speicher: der S3 hat 192 Symbole für ALLE Sende-Kanäle zusammen (4 x 48).
+    # ESPHome-Default ist 192 pro Licht -> ein zweites Licht bekäme keinen Kanal.
+    # 96 reichen, der Treiber füllt bei 100 LEDs per Interrupt nach.
+    rmt_symbols: 96
     # Harte Obergrenze, unabhängig von der Helligkeit in HA. Startwert = Sparmodus;
     # power.yaml hebt sie an, sobald das Netzteil genug Leistung liefert.
     color_correct:
@@ -36,6 +40,7 @@ light:
     num_leds: 1
     chipset: ws2812
     rgb_order: GRB
+    rmt_symbols: 48
     color_correct: [30%, 30%, 30%]
     restore_mode: ALWAYS_OFF
     entity_category: diagnostic
