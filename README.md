@@ -37,17 +37,16 @@ esphome/
 
 1. **Git** installieren: <https://git-scm.com/download/win>
 2. **Python 3.12** installieren: <https://www.python.org/downloads/> – beim Setup „Add python.exe to PATH“ anhaken.
-3. **ESPHome** installieren (PowerShell):
-   ```powershell
-   py -m pip install --upgrade pip
-   py -m pip install esphome
-   esphome version
-   ```
-4. **Repo klonen** und in VS Code öffnen:
+3. **Repo klonen**, ESPHome in der festgelegten Version installieren und VS Code öffnen (PowerShell):
    ```powershell
    git clone https://github.com/jfpuetz/wassist.git
-   code wassist
+   cd wassist
+   py -m pip install --upgrade pip
+   py -m pip install -r requirements.txt
+   esphome version
+   code .
    ```
+4. **VS-Code-Erweiterungen:**
    VS Code schlägt die empfohlenen Erweiterungen vor (ESPHome, YAML, C++, GitLens) → installieren.
 5. **Secrets anlegen:** `esphome/secrets.yaml.example` nach `esphome/secrets.yaml` kopieren und ausfüllen.
    API-Schlüssel erzeugen:

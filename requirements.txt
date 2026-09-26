@@ -1,0 +1,2 @@
+# Python-Abhaengigkeiten fuer Build und CI
+esphome==2026.6.5

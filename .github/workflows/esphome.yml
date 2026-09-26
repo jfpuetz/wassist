@@ -16,9 +16,10 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
+          cache-dependency-path: requirements.txt
 
       - name: Install ESPHome
-        run: pip install esphome
+        run: pip install -r requirements.txt
 
       - name: Dummy secrets
         run: cp esphome/secrets.yaml.example esphome/secrets.yaml
