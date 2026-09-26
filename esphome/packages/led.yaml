@@ -27,6 +27,19 @@ light:
           move_interval: 20ms
           scan_width: 8
 
+  # Diagnose: Onboard-RGB-LED des DevKit. Leuchtet sie, funktioniert die LED-Ansteuerung
+  # der Firmware – bleibt nur der Streifen dunkel, liegt es an Leitung/Streifen.
+  - platform: esp32_rmt_led_strip
+    id: board_led
+    name: Board-LED
+    pin: ${board_led_pin}
+    num_leds: 1
+    chipset: ws2812
+    rgb_order: GRB
+    color_correct: [30%, 30%, 30%]
+    restore_mode: ALWAYS_OFF
+    entity_category: diagnostic
+
 script:
   - id: led_idle
     then:
