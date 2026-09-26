@@ -36,8 +36,9 @@ substitutions:
   # Grenze durch die Bauteile: MP1584EN 28 V, INA219 26 V, -C8..-C11 35 V.
   # 12 V, bis die Spannungsfestigkeit von -C1/-C2 geprüft ist – bei >= 25 V auf 20V anheben.
   pd_max_voltage: 12V
-  # Unter dieser Leistung gilt das Netzteil als schwach (jedes reine 5-V-Netzteil liegt darunter).
-  pd_weak_below_w: "20"
+  # Schwaches Netzteil = unter 9 V (Wandler laufen dann in Dropout) oder unter dieser Leistung.
+  # Ein übliches 18-W-Netzteil (9 V / 2 A) gilt als ausreichend.
+  pd_weak_below_w: "15"
 
   # --- INA219-Shunts (CJMCU-219 ab Werk 0,1 Ohm) ---
   ina_shunt_ohm: 0.1 ohm

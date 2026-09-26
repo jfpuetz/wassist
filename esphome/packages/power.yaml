@@ -18,6 +18,7 @@ sensor:
     auto_select: true
     max_voltage: ${pd_max_voltage}
     voltage:
+      id: pd_voltage
       name: USB-PD Spannung
       entity_category: diagnostic
     current:
@@ -29,7 +30,7 @@ sensor:
       entity_category: diagnostic
       on_value:
         - lambda: |-
-            const bool weak = x < ${pd_weak_below_w};
+            const bool weak = id(pd_voltage).state < 8.5f || x < ${pd_weak_below_w};
             if (weak == id(pd_weak).state && id(pd_weak).has_state())
               return;
             id(pd_weak).publish_state(weak);
@@ -53,7 +54,8 @@ sensor:
     power:
       name: 9V Leistung
 
-  # -U6 INA219: LED-Zweig (5 V)
+  # -U6 INA219: LED-Zweig (5 V). CJMCU-219 ab Werk 0x40 -> Lötbrücke A0 schließen für 0x41,
+  # sonst antworten -U5 und -U6 gleichzeitig und liefern Unsinn.
   - platform: ina219
     address: 0x41
     shunt_resistance: ${ina_shunt_ohm}
