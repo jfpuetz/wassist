@@ -5,14 +5,23 @@ micro_wake_word:
   microphone:
     microphone: mic
     gain_factor: 4
+  # Mehrere Modelle: in Home Assistant unter "Aktivierungswort" auswählbar.
+  # Eigene Modelle später z. B. als lokale Datei: model: wake_words/hey_wassist.json
   models:
     - model: okay_nabu
+      id: okay_nabu
+    - model: hey_jarvis
+      id: hey_jarvis
+    - model: hey_mycroft
+      id: hey_mycroft
   on_wake_word_detected:
     - voice_assistant.start:
         wake_word: !lambda return wake_word;
 
 voice_assistant:
   id: va
+  # Verknüpfung, damit Home Assistant das Aktivierungswort auswählen kann
+  micro_wake_word: mww
   microphone:
     microphone: mic
     gain_factor: 4

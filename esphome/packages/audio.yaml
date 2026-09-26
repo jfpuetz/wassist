@@ -30,3 +30,17 @@ speaker:
     channel: mono
     sample_rate: 16000
     bits_per_sample: 16bit
+
+# Soundtest: kurze Tonfolge über Verstärker und Lautsprecher
+rtttl:
+  id: beeper
+  speaker: amp
+  gain: 50%
+
+button:
+  - platform: template
+    name: Testton
+    icon: mdi:volume-high
+    entity_category: diagnostic
+    on_press:
+      - rtttl.play: "wassist:d=8,o=5,b=160:c,e,g,c6,4p,c6,g,e,4c"
