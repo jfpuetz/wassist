@@ -91,6 +91,25 @@ text_sensor:
   - platform: version
     name: ESPHome-Version
     entity_category: diagnostic
+  # Eigene Firmware-Version (vom GitHub-Build gesetzt, lokal "dev")
+  - platform: template
+    name: Firmware installiert
+    icon: mdi:chip
+    entity_category: diagnostic
+    update_interval: 60s
+    lambda: return {ESPHOME_PROJECT_VERSION};
+  # Neueste Version laut GitHub-Manifest (leer, bis die erste Prüfung durch ist)
+  - platform: template
+    id: fw_latest
+    name: Firmware verfügbar
+    icon: mdi:cloud-download
+    entity_category: diagnostic
+    update_interval: 60s
+    lambda: |-
+      const auto &v = id(firmware_update).update_info.latest_version;
+      if (v.empty())
+        return {"noch nicht geprüft"};
+      return v;
 
 button:
   - platform: restart
