@@ -73,7 +73,10 @@
       <ol>
         <li>ESP32-S3 am Port <strong>„USB“</strong> anstecken (nicht „UART/COM“).</li>
         <li>„Firmware installieren“ klicken, den Port wählen und „Install“ bestätigen.</li>
-        <li>Wird kein Port angeboten: <strong>BOOT</strong> gedrückt halten, kurz <strong>RESET</strong> tippen, BOOT loslassen – dann erneut versuchen.</li>
+        <li><strong>Erstes Flashen / „Failed to initialize“:</strong> Board abziehen, <strong>BOOT gedrückt halten und anstecken</strong>,
+          BOOT loslassen. Dann „Firmware installieren“ klicken und den Port <em>neu</em> auswählen – das Board meldet sich im
+          Download-Modus als neues Gerät. (Der Hinweis „BOOT beim Klick auf INSTALL halten“ im Fehlerdialog reicht hier nicht.)
+          Nach „Installation complete“ einmal <strong>RESET</strong> drücken.</li>
         <li>Nach dem Flashen fragt die Seite direkt nach dem WLAN (Improv).</li>
         <li>Home Assistant findet den Node danach automatisch unter <em>Einstellungen → Geräte &amp; Dienste</em>.</li>
       </ol>

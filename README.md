@@ -64,6 +64,12 @@ web/                        # Installationsseite (ESP Web Tools) + Manifest
 
 Wie bei WLED: **<https://jfpuetz.github.io/wassist/>** in Chrome oder Edge öffnen →
 „Firmware installieren“ → Port wählen. Direkt danach fragt die Seite das WLAN ab.
+**Erstes Flashen:** Ab Werk läuft auf vielen N16R8-Boards eine Test-Firmware, die den automatischen Reset
+ignoriert (Browser-Konsole zeigt `ProductID 0x4001`, Fehler „Failed to initialize“). Dann:
+Board abziehen → **BOOT gedrückt halten und anstecken** → BOOT loslassen → „Firmware installieren“ → Port
+**neu** auswählen (Download-Modus = `ProductID 0x1001`) → nach dem Flashen RESET drücken.
+Danach ist das nicht mehr nötig. Alternativ den Port „UART/COM“ verwenden, der resettet immer automatisch.
+
 Die Seite wird bei jedem Push auf `main` von GitHub Actions neu gebaut und zeigt immer die aktuelle Firmware.
 Die fertigen `.bin`-Dateien liegen außerdem bei jedem Actions-Lauf als Artefakt zum Download.
 
