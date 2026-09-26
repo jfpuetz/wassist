@@ -20,7 +20,9 @@ substitutions:
   amp_lrc: GPIO16     # I2S1_LRC   -> -U3 LRC
   amp_din: GPIO17     # I2S1_DIN   -> -U3 DIN
   led_pin: GPIO38     # LED_D_MCU  -> -R1 -> -STRIP1 DIN
-  board_led_pin: GPIO48  # Onboard-RGB-LED (DevKitC-1 v1.0 und viele Nachbauten; v1.1: GPIO38)
+  # Onboard-RGB-LED: GPIO48 (DevKitC-1 v1.0 / YD-ESP32-S3-Nachbau). Beim YD-Layout erst
+  # nach Schließen der Lötbrücke "RGB" angeschlossen. Lötbrücke "IN-OUT" offen lassen.
+  board_led_pin: GPIO48
 
   # --- LED-Streifen ---
   led_count: "100"
