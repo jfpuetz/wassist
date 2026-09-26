@@ -1,0 +1,47 @@
+# WAssist – Node 1
+# Schaltplan: WASSIST-N1-E01…E04 (Rev. 01, 2026-09-20)
+#
+# Einstieg:   esphome run esphome/wassist-node1.yaml
+# Nur prüfen: esphome config esphome/wassist-node1.yaml
+#
+# Ein zweiter Node ist eine Kopie dieser Datei mit anderen substitutions.
+
+substitutions:
+  node_name: wassist-node1
+  friendly_name: WAssist Node 1
+
+  # --- Pinbelegung (muss zu Blatt 3 / Anschlussliste passen) ---
+  i2c_sda: GPIO8
+  i2c_scl: GPIO9
+  mic_bclk: GPIO4     # I2S0_BCLK  -> -U4 SCK
+  mic_ws: GPIO5       # I2S0_WS    -> -U4 WS
+  mic_sd: GPIO6       # I2S0_SD    <- -U4 SD
+  amp_bclk: GPIO15    # I2S1_BCLK  -> -U3 BCLK
+  amp_lrc: GPIO16     # I2S1_LRC   -> -U3 LRC
+  amp_din: GPIO17     # I2S1_DIN   -> -U3 DIN
+  led_pin: GPIO38     # LED_D_MCU  -> -R1 -> -STRIP1 DIN
+
+  # --- LED-Streifen ---
+  led_count: "100"
+  # Strombegrenzung per Software: 100 LEDs x 60 mA = 6 A bei Vollweiß.
+  # INA219 (-U6) misst mit 0,1-Ohm-Shunt nur bis ca. 3,2 A, daher max. 40 %.
+  led_max_brightness: 40%
+
+  # --- INA219-Shunts (CJMCU-219 ab Werk 0,1 Ohm) ---
+  ina_shunt_ohm: 0.1 ohm
+  ina_max_current: 3.2A
+
+esphome:
+  name: ${node_name}
+  friendly_name: ${friendly_name}
+  min_version: 2025.5.0
+  project:
+    name: jfpuetz.wassist
+    version: "0.1.0"
+
+packages:
+  base: !include packages/base.yaml
+  power: !include packages/power.yaml
+  audio: !include packages/audio.yaml
+  voice: !include packages/voice.yaml
+  led: !include packages/led.yaml

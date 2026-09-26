@@ -1,0 +1,56 @@
+# Sprachassistent: lokales Wake Word auf dem ESP32-S3, danach Home Assistant Assist.
+
+micro_wake_word:
+  id: mww
+  microphone:
+    microphone: mic
+    gain_factor: 4
+  models:
+    - model: okay_nabu
+  on_wake_word_detected:
+    - voice_assistant.start:
+        wake_word: !lambda return wake_word;
+
+voice_assistant:
+  id: va
+  microphone:
+    microphone: mic
+    gain_factor: 4
+  speaker: amp
+  noise_suppression_level: 2
+  auto_gain: 31dBFS
+  volume_multiplier: 2.0
+  on_listening:
+    - script.execute: led_listening
+  on_stt_vad_end:
+    - script.execute: led_thinking
+  on_tts_start:
+    - script.execute: led_speaking
+  on_end:
+    - wait_until:
+        not:
+          voice_assistant.is_running:
+    - script.execute: led_idle
+    - micro_wake_word.start:
+  on_error:
+    - script.execute: led_error
+  on_client_connected:
+    - micro_wake_word.start:
+    - script.execute: led_idle
+  on_client_disconnected:
+    - voice_assistant.stop:
+    - micro_wake_word.stop:
+    - script.execute: led_error
+
+switch:
+  - platform: template
+    name: Wake Word aktiv
+    id: wake_word_enabled
+    icon: mdi:microphone
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+    entity_category: config
+    on_turn_on:
+      - micro_wake_word.start:
+    on_turn_off:
+      - micro_wake_word.stop:

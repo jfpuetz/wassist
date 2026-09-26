@@ -1,0 +1,50 @@
+# Stromversorgung: USB-PD-Status (HUSB238, -U2) und Strommessung (INA219, -U5/-U6).
+#
+# I2C-Adressen laut Schaltplan: 0x08 -U2, 0x40 -U5, 0x41 -U6.
+
+external_components:
+  - source:
+      type: local
+      path: components
+    components: [husb238]
+
+sensor:
+  # -U2 HUSB238: ausgehandelter PD-Vertrag (nur lesend – Spannung kommt per Jumper)
+  - platform: husb238
+    address: 0x08
+    update_interval: 30s
+    voltage:
+      name: USB-PD Spannung
+      entity_category: diagnostic
+    current:
+      name: USB-PD Strom (Vertrag)
+      entity_category: diagnostic
+
+  # -U5 INA219: Gesamtstrom 9-V-Schiene (beide Wandler-Eingänge)
+  - platform: ina219
+    address: 0x40
+    shunt_resistance: ${ina_shunt_ohm}
+    max_voltage: 16V
+    max_current: ${ina_max_current}
+    update_interval: 5s
+    bus_voltage:
+      name: 9V Spannung
+    current:
+      name: 9V Strom
+    power:
+      name: 9V Leistung
+
+  # -U6 INA219: LED-Zweig (5 V)
+  - platform: ina219
+    address: 0x41
+    shunt_resistance: ${ina_shunt_ohm}
+    max_voltage: 16V
+    max_current: ${ina_max_current}
+    update_interval: 5s
+    bus_voltage:
+      name: LED Spannung
+    current:
+      id: led_current
+      name: LED Strom
+    power:
+      name: LED Leistung

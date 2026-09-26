@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "esphome.esphome-vscode",
+    "redhat.vscode-yaml",
+    "ms-python.python",
+    "ms-vscode.cpptools",
+    "eamodio.gitlens"
+  ]
+}

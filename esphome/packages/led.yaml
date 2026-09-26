@@ -1,0 +1,70 @@
+# Status-LEDs: WS2812B-Streifen (-STRIP1) an GPIO38 über -R1.
+# Hinweis: GPIO38 treibt auf DevKitC-1 v1.1 auch die Onboard-RGB-LED (spiegelt Pixel 1).
+
+light:
+  - platform: esp32_rmt_led_strip
+    id: status_led
+    name: Status-LED
+    pin: ${led_pin}
+    num_leds: ${led_count}
+    chipset: ws2812
+    rgb_order: GRB
+    # Hardware-Obergrenze für den Strom, unabhängig von der Helligkeit in HA
+    color_correct:
+      - ${led_max_brightness}
+      - ${led_max_brightness}
+      - ${led_max_brightness}
+    default_transition_length: 200ms
+    restore_mode: ALWAYS_OFF
+    effects:
+      - pulse:
+          name: Pulsieren
+          transition_length: 600ms
+          update_interval: 600ms
+      - addressable_scan:
+          name: Lauflicht
+          move_interval: 20ms
+          scan_width: 8
+
+script:
+  - id: led_idle
+    then:
+      - light.turn_off: status_led
+  - id: led_listening
+    then:
+      - light.turn_on:
+          id: status_led
+          brightness: 60%
+          red: 0%
+          green: 40%
+          blue: 100%
+          effect: Pulsieren
+  - id: led_thinking
+    then:
+      - light.turn_on:
+          id: status_led
+          brightness: 60%
+          red: 60%
+          green: 0%
+          blue: 100%
+          effect: Lauflicht
+  - id: led_speaking
+    then:
+      - light.turn_on:
+          id: status_led
+          brightness: 60%
+          red: 0%
+          green: 100%
+          blue: 40%
+          effect: none
+  - id: led_error
+    then:
+      - light.turn_on:
+          id: status_led
+          brightness: 40%
+          red: 100%
+          green: 0%
+          blue: 0%
+          effect: none
+      - delay: 2s
+      - light.turn_off: status_led

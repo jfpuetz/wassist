@@ -1,0 +1,32 @@
+# Audio: zwei getrennte I2S-Busse.
+#   I2S0 -> Mikrofon INMP441 (-U4), L/R an Masse = linker Kanal
+#   I2S1 -> Verstärker MAX98357A (-U3), SD an VIN = linker Kanal, GAIN offen = 9 dB
+
+i2s_audio:
+  - id: i2s_mic_bus
+    i2s_bclk_pin: ${mic_bclk}
+    i2s_lrclk_pin: ${mic_ws}
+  - id: i2s_amp_bus
+    i2s_bclk_pin: ${amp_bclk}
+    i2s_lrclk_pin: ${amp_lrc}
+
+microphone:
+  - platform: i2s_audio
+    id: mic
+    i2s_audio_id: i2s_mic_bus
+    i2s_din_pin: ${mic_sd}
+    adc_type: external
+    pdm: false
+    channel: left
+    bits_per_sample: 32bit
+    sample_rate: 16000
+
+speaker:
+  - platform: i2s_audio
+    id: amp
+    i2s_audio_id: i2s_amp_bus
+    i2s_dout_pin: ${amp_din}
+    dac_type: external
+    channel: mono
+    sample_rate: 16000
+    bits_per_sample: 16bit
