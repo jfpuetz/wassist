@@ -118,3 +118,29 @@ button:
   - platform: factory_reset
     name: Werkseinstellungen
     entity_category: config
+  # Firmware direkt von GitHub holen – ohne Datei-Upload
+  - platform: template
+    name: Nach Update suchen
+    icon: mdi:cloud-search
+    entity_category: config
+    on_press:
+      - update.check: firmware_update
+      - delay: 10s
+      - component.update: fw_latest
+  - platform: template
+    name: Update installieren
+    icon: mdi:cloud-download
+    entity_category: config
+    on_press:
+      - if:
+          condition:
+            update.is_available: firmware_update
+          then:
+            - logger.log:
+                level: INFO
+                format: "Installiere Firmware-Update von GitHub ..."
+            - update.perform: firmware_update
+          else:
+            - logger.log:
+                level: WARN
+                format: "Kein Update verfuegbar - erst 'Nach Update suchen' druecken"

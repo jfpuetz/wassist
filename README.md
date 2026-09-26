@@ -113,7 +113,9 @@ Findet der Node sein gespeichertes WLAN später 30 s lang nicht, öffnet er den 
 - **Automatisch von GitHub:** Der Node prüft alle 6 h `https://jfpuetz.github.io/wassist/manifest.json`.
   Gibt es eine neuere Version, zeigen Home Assistant und die Weboberfläche **„Firmware – Update verfügbar“**
   mit Installieren-Button. Installiert wird nur auf Knopfdruck.
-- **Manuell:** Weboberfläche `http://<IP>` → Abschnitt „OTA Update“ → `wassist-node1.ota.bin` wählen
+- **Aus der Weboberfläche:** „Nach Update suchen“ (fragt GitHub sofort ab) → „Firmware verfügbar“ zeigt
+  die neue Version → „Update installieren“. Kein Datei-Upload nötig.
+- **Datei-Upload:** Weboberfläche `http://<IP>` → Abschnitt „OTA Update“ → `wassist-node1.ota.bin` wählen
   (aus dem Actions-Artefakt oder von der Pages-Seite).
 - **Per CLI:** `esphome run esphome/wassist-node1.yaml` → Node im Netzwerk wählen.
 
