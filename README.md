@@ -36,16 +36,25 @@ esphome/
 ## Einrichtung (Windows)
 
 1. **Git** installieren: <https://git-scm.com/download/win>
-2. **Python 3.12** installieren: <https://www.python.org/downloads/> – beim Setup „Add python.exe to PATH“ anhaken.
-3. **Repo klonen**, ESPHome in der festgelegten Version installieren und VS Code öffnen (PowerShell):
+2. **Python** installieren (3.12 oder neuer): <https://www.python.org/downloads/> – beim Setup „Add python.exe to PATH“ anhaken.
+3. **Repo klonen**, eine eigene virtuelle Umgebung anlegen und ESPHome darin installieren (PowerShell).
+   ESPHome pinnt viele Pakete exakt (z. B. `click`) – in der globalen Python-Installation
+   kollidiert das mit anderen Tools wie `huggingface-hub`. Deshalb immer in `.venv` arbeiten:
    ```powershell
    git clone https://github.com/jfpuetz/wassist.git
    cd wassist
-   py -m pip install --upgrade pip
-   py -m pip install -r requirements.txt
+   py -m venv .venv
+   .\.venv\Scripts\Activate.ps1          # Prompt zeigt danach (.venv)
+   python -m pip install --upgrade pip
+   pip install -r requirements.txt
    esphome version
    code .
    ```
+   Falls `Activate.ps1` wegen der Ausführungsrichtlinie blockiert wird, einmalig:
+   `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
+   In jedem neuen Terminal vor der Arbeit erneut `.\.venv\Scripts\Activate.ps1` ausführen.
+   VS Code erkennt `.venv` automatisch (unten rechts als Python-Interpreter auswählen);
+   das integrierte Terminal aktiviert sie dann selbst.
 4. **VS-Code-Erweiterungen:**
    VS Code schlägt die empfohlenen Erweiterungen vor (ESPHome, YAML, C++, GitLens) → installieren.
 5. **Secrets anlegen:** `esphome/secrets.yaml.example` nach `esphome/secrets.yaml` kopieren und ausfüllen.
