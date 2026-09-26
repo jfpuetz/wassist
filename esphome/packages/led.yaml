@@ -13,12 +13,9 @@ light:
     # ESPHome-Default ist 192 pro Licht -> ein zweites Licht bekäme keinen Kanal.
     # 96 reichen, der Treiber füllt bei 100 LEDs per Interrupt nach.
     rmt_symbols: 96
-    # Harte Obergrenze, unabhängig von der Helligkeit in HA. Startwert = Sparmodus;
-    # power.yaml hebt sie an, sobald das Netzteil genug Leistung liefert.
-    color_correct:
-      - ${led_cap_weak}
-      - ${led_cap_weak}
-      - ${led_cap_weak}
+    # Harte Obergrenze, unabhängig von der Helligkeit in HA. Startwert = Sparmodus
+    # (34 % vor Gamma = 0,34^2,8 ≈ 5 % Strom); power.yaml setzt sie abhängig vom Netzteil.
+    color_correct: [34%, 34%, 34%]
     default_transition_length: 200ms
     restore_mode: ALWAYS_OFF
     effects:

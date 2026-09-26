@@ -150,7 +150,7 @@ Danach unter Einstellungen → Sprachassistenten eine Assist-Pipeline wählen. W
 
 ## Offene Punkte (siehe Schaltplan-Notizen)
 
-- [x] INA219-Messbereich: LED-Helligkeit hart auf 20 % (≈1,2 A) bzw. 5 % bei schwachem Netzteil gedeckelt
+- [x] INA219-Messbereich: LED-Strom hart auf 20 % (≈1,2 A) bzw. 5 % bei schwachem Netzteil gedeckelt (gammakorrigiert)
 - [ ] -C1/-C2 Spannungsfestigkeit prüfen → bei ≥ 25 V `pd_max_voltage` auf 20V anheben
 - [ ] WS2812B-Pegel: -U7 auf 4,5 V **oder** 74AHCT125
 - [ ] -U3 SD an einen GPIO → Software-Mute

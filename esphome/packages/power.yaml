@@ -35,10 +35,12 @@ sensor:
               return;
             id(pd_weak).publish_state(weak);
             const float cap = weak ? ${led_cap_weak} : ${led_cap_normal};
+            // Obergrenze wirkt vor der Gammakurve -> in Stromanteil umrechnen
+            const float corr = powf(cap, 1.0f / ${led_gamma});
             auto *out = static_cast<light::AddressableLight *>(id(status_led)->get_output());
-            out->set_correction(cap, cap, cap);
-            ESP_LOGI("power", "Netzteil %.0f W -> %s, LED-Obergrenze %.0f %%",
-                     x, weak ? "schwach" : "ok", cap * 100.0f);
+            out->set_correction(corr, corr, corr);
+            ESP_LOGI("power", "Netzteil %.0f W -> %s, LED-Obergrenze %.0f %% Strom (Korrektur %.0f %%)",
+                     x, weak ? "schwach" : "ok", cap * 100.0f, corr * 100.0f);
 
   # -U5 INA219: Gesamtstrom 9-V-Schiene (beide Wandler-Eingänge)
   - platform: ina219

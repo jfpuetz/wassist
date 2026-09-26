@@ -31,8 +31,11 @@ substitutions:
   led_count: "100"
   # Harte Helligkeitsobergrenze (unabhängig von HA). Die LEDs sind nur dezente
   # Statusanzeige – 100 LEDs x 60 mA = 6 A bei Vollweiß wären weit mehr als nötig.
-  led_cap_normal: "0.20"   # 20 % -> max. ca. 1,2 A, bei ausreichendem Netzteil
-  led_cap_weak: "0.05"     #  5 % -> max. ca. 0,3 A, beim Start und bei schwachem Netzteil
+  # Werte = Anteil des maximalen Stroms (100 LEDs Vollweiß = 6 A). Die Firmware rechnet sie
+  # in den Wert vor der Gammakorrektur (2,8) um – sonst wären 20 % real nur ~1 % Strom.
+  led_cap_normal: "0.20"   # 20 % -> max. ca. 1,2 A / 6 W, bei ausreichendem Netzteil
+  led_cap_weak: "0.05"     #  5 % -> max. ca. 0,3 A / 1,5 W, beim Start und bei schwachem Netzteil
+  led_gamma: "2.8"         # ESPHome-Default für gamma_correct
 
   # --- USB-PD ---
   # Der Node fordert das Netzteil-Angebot mit der meisten Leistung an, höchstens pd_max_voltage.
