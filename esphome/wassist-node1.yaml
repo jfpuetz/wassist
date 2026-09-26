@@ -9,6 +9,9 @@
 substitutions:
   node_name: wassist-node1
   friendly_name: WAssist Node 1
+  # Firmware-Version: lokal "dev", der GitHub-Build setzt Datum + Commit (esphome -s fw_version ...)
+  fw_version: dev
+  update_manifest_url: https://jfpuetz.github.io/wassist/manifest.json
 
   # --- Pinbelegung (muss zu Blatt 3 / Anschlussliste passen) ---
   i2c_sda: GPIO8
@@ -50,7 +53,7 @@ esphome:
   min_version: 2025.5.0
   project:
     name: jfpuetz.wassist
-    version: "0.1.0"
+    version: ${fw_version}
 
 packages:
   base: !include packages/base.yaml

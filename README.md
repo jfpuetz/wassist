@@ -108,6 +108,19 @@ Alternativ direkt nach dem Flashen per USB: <https://web.esphome.io> in Chrome/E
 
 Findet der Node sein gespeichertes WLAN später 30 s lang nicht, öffnet er den Hotspot erneut.
 
+## Firmware-Updates
+
+- **Automatisch von GitHub:** Der Node prüft alle 6 h `https://jfpuetz.github.io/wassist/manifest.json`.
+  Gibt es eine neuere Version, zeigen Home Assistant und die Weboberfläche **„Firmware – Update verfügbar“**
+  mit Installieren-Button. Installiert wird nur auf Knopfdruck.
+- **Manuell:** Weboberfläche `http://<IP>` → Abschnitt „OTA Update“ → `wassist-node1.ota.bin` wählen
+  (aus dem Actions-Artefakt oder von der Pages-Seite).
+- **Per CLI:** `esphome run esphome/wassist-node1.yaml` → Node im Netzwerk wählen.
+
+Die Versionsnummer (`JJJJ.MM.TT-<commit>`) setzt der GitHub-Build. Lokal gebaute Firmware heißt `dev` –
+dann meldet der Node immer ein Update, bis wieder eine GitHub-Version drauf ist.
+Für den Download braucht der Node HTTPS-Zugang ins Internet (github.io).
+
 ## Stromversorgung
 
 Die HUSB238-Jumper bleiben im **Werkszustand (5 V / 1 A)** – so startet der Node an jedem USB-Netzteil.

@@ -10,7 +10,13 @@
       "improv": true,
       "parts": [
         { "path": "wassist-node1.factory.bin", "offset": 0 }
-      ]
+      ],
+      "ota": {
+        "path": "wassist-node1.ota.bin",
+        "md5": "__MD5__",
+        "summary": "__SUMMARY__",
+        "release_url": "https://github.com/jfpuetz/wassist/commit/__SHA__"
+      }
     }
   ]
 }

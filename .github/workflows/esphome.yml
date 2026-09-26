@@ -28,8 +28,12 @@ jobs:
       - name: Install ESPHome
         run: pip install -r requirements.txt
 
+      - name: Firmware version
+        id: ver
+        run: echo "version=$(date -u +%Y.%m.%d)-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
       - name: Validate config
-        run: esphome config esphome/wassist-node1.yaml
+        run: esphome -s fw_version "${{ steps.ver.outputs.version }}" config esphome/wassist-node1.yaml
 
       - name: Cache PlatformIO
         uses: actions/cache@v4
@@ -41,7 +45,7 @@ jobs:
           restore-keys: pio-${{ runner.os }}-
 
       - name: Compile firmware
-        run: esphome compile esphome/wassist-node1.yaml
+        run: esphome -s fw_version "${{ steps.ver.outputs.version }}" compile esphome/wassist-node1.yaml
 
       # Webinstaller: Firmware + Manifest + Installationsseite zusammenstellen
       - name: Assemble web installer
@@ -50,13 +54,19 @@ jobs:
           FACTORY=$(find esphome/.esphome/build/wassist-node1 -name 'firmware.factory.bin' | head -n1)
           OTA=$(find esphome/.esphome/build/wassist-node1 -name 'firmware.ota.bin' | head -n1)
           test -n "$FACTORY" || { echo "firmware.factory.bin nicht gefunden"; exit 1; }
+          test -n "$OTA" || { echo "firmware.ota.bin nicht gefunden"; exit 1; }
           mkdir -p site
           cp web/index.html site/
           cp "$FACTORY" site/wassist-node1.factory.bin
-          if [ -n "$OTA" ]; then cp "$OTA" site/wassist-node1.ota.bin; fi
-          VERSION="$(date -u +%Y.%m.%d)-${GITHUB_SHA::7}"
-          sed "s/__VERSION__/${VERSION}/" web/manifest.json > site/manifest.json
+          cp "$OTA" site/wassist-node1.ota.bin
+          VERSION="${{ steps.ver.outputs.version }}"
+          MD5=$(md5sum site/wassist-node1.ota.bin | cut -d' ' -f1)
+          SUMMARY=$(git log -1 --format=%s | tr -d '"\\' | sed 's/[&/|]/-/g' | cut -c1-120)
+          sed -e "s|__VERSION__|${VERSION}|" -e "s|__MD5__|${MD5}|" \
+              -e "s|__SUMMARY__|${SUMMARY}|" -e "s|__SHA__|${GITHUB_SHA}|" \
+              web/manifest.json > site/manifest.json
           sed -i "s/__VERSION__/${VERSION}/" site/index.html
+          python3 -m json.tool site/manifest.json
           ls -la site
 
       - name: Upload firmware

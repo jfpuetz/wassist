@@ -29,9 +29,28 @@ api:
   encryption: {}   # Schlüssel wird von Home Assistant bei der Einbindung gesetzt
 
 ota:
+  # Per WLAN aus ESPHome/CLI. Ohne Passwort: jedes Gerät im selben Netz könnte flashen.
+  # Für mehr Schutz hier ein Passwort setzen (dann auch in HA/CLI verwenden).
   - platform: esphome
-    # Ohne Passwort: jedes Gerät im selben Netz könnte Firmware aufspielen.
-    # Für mehr Schutz hier ein Passwort setzen (dann auch in HA/CLI verwenden).
+  # .bin-Datei manuell in der Weboberfläche hochladen
+  - platform: web_server
+  # Update aus dem GitHub-Release (siehe update: unten)
+  - platform: http_request
+
+# --- Firmware-Updates von GitHub ---
+# Der Node prüft alle 6 h das Manifest auf GitHub Pages. Ist dort eine andere Version
+# als die laufende, erscheint in HA und der Weboberfläche "Update verfügbar" mit Installieren-Button.
+# Installiert wird nur auf Knopfdruck. Die Version setzt der GitHub-Build (fw_version).
+http_request:
+  verify_ssl: true
+  timeout: 20s
+
+update:
+  - platform: http_request
+    id: firmware_update
+    name: Firmware
+    source: ${update_manifest_url}
+    update_interval: 6h
 
 wifi:
   ap:
@@ -49,7 +68,6 @@ web_server:
   port: 80
   version: 3
   log: true
-  ota: false
 
 improv_serial:
 
