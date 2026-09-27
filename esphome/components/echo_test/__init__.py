@@ -11,6 +11,8 @@ DEPENDENCIES = ["microphone", "speaker"]
 AUTO_LOAD = ["audio"]
 
 CONF_GAIN_FACTOR = "gain_factor"
+CONF_NORMALIZE = "normalize"
+CONF_MAX_NORMALIZE_GAIN = "max_normalize_gain"
 CONF_ON_RECORD_START = "on_record_start"
 CONF_ON_PLAYBACK_START = "on_playback_start"
 CONF_ON_FINISHED = "on_finished"
@@ -33,6 +35,10 @@ CONFIG_SCHEMA = cv.Schema(
             ),
         ),
         cv.Optional(CONF_GAIN_FACTOR, default=4): cv.int_range(min=1, max=64),
+        cv.Optional(CONF_NORMALIZE, default=True): cv.boolean,
+        cv.Optional(CONF_MAX_NORMALIZE_GAIN, default=16.0): cv.float_range(
+            min=1.0, max=64.0
+        ),
         cv.Optional(CONF_ON_RECORD_START): automation.validate_automation(single=True),
         cv.Optional(CONF_ON_PLAYBACK_START): automation.validate_automation(
             single=True
@@ -52,6 +58,8 @@ async def to_code(config):
     cg.add(var.set_speaker(spk))
     cg.add(var.set_duration_ms(config[CONF_DURATION].total_milliseconds))
     cg.add(var.set_gain_factor(config[CONF_GAIN_FACTOR]))
+    cg.add(var.set_normalize(config[CONF_NORMALIZE]))
+    cg.add(var.set_max_normalize_gain(config[CONF_MAX_NORMALIZE_GAIN]))
 
     if conf := config.get(CONF_ON_RECORD_START):
         await automation.build_automation(var.get_record_start_trigger(), [], conf)

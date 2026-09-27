@@ -24,6 +24,8 @@ class EchoTest : public Component {
   void set_speaker(speaker::Speaker *spk) { this->spk_ = spk; }
   void set_duration_ms(uint32_t ms) { this->duration_ms_ = ms; }
   void set_gain_factor(int gain) { this->gain_factor_ = gain; }
+  void set_normalize(bool n) { this->normalize_ = n; }
+  void set_max_normalize_gain(float g) { this->max_normalize_gain_ = g; }
 
   /// Start recording; playback follows automatically.
   void start();
@@ -39,11 +41,15 @@ class EchoTest : public Component {
   void on_mic_data_(const std::vector<uint8_t> &data);
   void set_state_(State s);
   void finish_();
+  /// Logs peak/RMS level and noise floor, optionally normalizes the recording in place.
+  void analyze_and_normalize_(size_t samples);
 
   microphone::Microphone *mic_{nullptr};
   speaker::Speaker *spk_{nullptr};
   uint32_t duration_ms_{5000};
   int gain_factor_{4};
+  bool normalize_{true};
+  float max_normalize_gain_{16.0f};
 
   int16_t *buffer_{nullptr};
   size_t capacity_samples_{0};

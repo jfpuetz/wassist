@@ -32,10 +32,14 @@ speaker:
     bits_per_sample: 16bit
 
 # Soundtest: kurze Tonfolge über Verstärker und Lautsprecher
+# ACHTUNG: rtttl setzt beim Abspielen die Lautsprecher-Lautstärke auf seinen eigenen "gain".
+# Deshalb vor jedem Ton gain = Lautstärke-Regler und danach die Lautstärke wiederherstellen.
 rtttl:
   id: beeper
   speaker: amp
   gain: 50%
+  on_finished_playback:
+    - script.execute: apply_volume
 
 # --- Lautstärke ---
 # Software-Lautstärke des I2S-Lautsprechers (dB-Kurve), gilt für Sprachausgabe, Testton und Echo-Test.
@@ -53,7 +57,7 @@ number:
     restore_value: true
     initial_value: 50
     on_value:
-      - lambda: id(amp).set_volume(x / 100.0f);
+      - script.execute: apply_volume
 
 switch:
   - platform: template
@@ -119,6 +123,22 @@ binary_sensor:
       - script.execute: volume_feedback
 
 script:
+  - id: apply_volume
+    mode: restart
+    then:
+      - lambda: |-
+          const float v = id(volume).state / 100.0f;
+          id(beeper).set_gain(v);
+          id(amp).set_volume(v);
+
+  - id: play_tone
+    mode: restart
+    parameters:
+      song: string
+    then:
+      - lambda: id(beeper).set_gain(id(volume).state / 100.0f);
+      - rtttl.play: !lambda return song;
+
   - id: volume_feedback
     mode: restart
     then:
@@ -130,7 +150,9 @@ script:
                   voice_assistant.is_running:
               - lambda: return !id(echo).is_busy();
           then:
-            - rtttl.play: "vol:d=16,o=6,b=200:c"
+            - script.execute:
+                id: play_tone
+                song: "vol:d=16,o=6,b=200:c"
 
 button:
   - platform: template
@@ -138,4 +160,6 @@ button:
     icon: mdi:volume-high
     entity_category: diagnostic
     on_press:
-      - rtttl.play: "wassist:d=8,o=5,b=160:c,e,g,c6,4p,c6,g,e,4c"
+      - script.execute:
+          id: play_tone
+          song: "wassist:d=8,o=5,b=160:c,e,g,c6,4p,c6,g,e,4c"

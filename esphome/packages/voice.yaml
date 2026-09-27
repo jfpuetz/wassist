@@ -32,6 +32,10 @@ echo_test:
   speaker: amp
   duration: 5s
   gain_factor: 4
+  # Leise Aufnahmen vor dem Abspielen anheben (Spitze auf ~ -3 dBFS, höchstens x16).
+  # Pegel und Rauschen stehen im Log ("Peak ... RMS ... dBFS").
+  normalize: true
+  max_normalize_gain: 16
   on_record_start:
     - script.execute: led_listening
   on_playback_start:
