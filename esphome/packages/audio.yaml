@@ -20,7 +20,7 @@ microphone:
     i2s_din_pin: ${mic_sd}
     adc_type: external
     pdm: false
-    channel: left
+    channel: ${mic_channel}
     bits_per_sample: 32bit
     sample_rate: 16000
 
@@ -55,8 +55,12 @@ media_player:
       num_channels: 1
       sample_rate: 48000
     task_stack_in_psram: true
-    volume_initial: 50%
+    volume_initial: 60%
     volume_increment: 5%
+    # Software-Lautstärke regelt über 49 dB; ohne Untergrenze wäre schon 50 % = -25 dB.
+    # 0..100 % in HA -> -24,5..0 dB am Lautsprecher (ganz aus = "Stumm").
+    volume_min: 50%
+    volume_max: 100%
     # Eingebaute Töne (WAV 48 kHz mono), laufen über den Media Player und damit mit dessen Lautstärke
     files:
       - id: snd_beep
@@ -88,7 +92,7 @@ number:
     mode: slider
     optimistic: true
     restore_value: false
-    initial_value: 50
+    initial_value: 60
     on_value:
       - if:
           condition:

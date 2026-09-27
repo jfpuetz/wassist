@@ -17,6 +17,11 @@ psram:
 logger:
   level: DEBUG
 
+# Einstellungen (Lautstärke usw.) seltener in den Flash schreiben: ein Flash-Schreibvorgang
+# hält kurz beide Kerne an und kann die Wake-Word-Erkennung aus dem Takt bringen.
+preferences:
+  flash_write_interval: 5min
+
 # --- Einrichtung ohne secrets.yaml (wie bei WLED) ---
 # 1. Ohne gespeichertes WLAN öffnet der Node den Hotspot "${friendly_name} Setup".
 #    Handy verbinden -> Einrichtungsseite öffnet sich (sonst http://192.168.4.1)

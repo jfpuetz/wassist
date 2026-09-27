@@ -19,6 +19,9 @@ substitutions:
   mic_bclk: GPIO4     # I2S0_BCLK  -> -U4 SCK
   mic_ws: GPIO5       # I2S0_WS    -> -U4 WS
   mic_sd: GPIO6       # I2S0_SD    <- -U4 SD
+  # Kanal des INMP441: L/R an GND = left, L/R an VDD = right. Stimmt er nicht (oder ist L/R
+  # offen), liest der ESP den leeren Zeitschlitz -> Rauschen/Knacken, Sprache nur ganz leise.
+  mic_channel: left
   amp_bclk: GPIO15    # I2S1_BCLK  -> -U3 BCLK
   amp_lrc: GPIO16     # I2S1_LRC   -> -U3 LRC
   amp_din: GPIO17     # I2S1_DIN   -> -U3 DIN

@@ -91,28 +91,38 @@ void EchoTest::on_mic_data_(const std::vector<uint8_t> &data) {
 static float to_dbfs(float v) { return v <= 0.0f ? -120.0f : 20.0f * log10f(v / 32768.0f); }
 
 void EchoTest::analyze_and_normalize_(size_t samples) {
-  // Overall peak / RMS and the quietest 100 ms window as noise-floor estimate
+  // Overall peak / RMS and the quietest 100 ms window as noise-floor estimate.
+  // Integer math only (float/double on 80k samples blocked the main loop ~100 ms).
   const size_t window = SAMPLE_RATE / 10;
   int32_t peak = 0;
-  double sum_sq = 0.0;
-  double win_sq = 0.0;
-  double min_win_rms = 1e9;
+  uint64_t sum_sq = 0;
+  uint64_t win_sq = 0;
+  uint64_t min_win_sq = UINT64_MAX;
+  size_t clipped = 0;
   for (size_t i = 0; i < samples; i++) {
     const int32_t s = this->buffer_[i];
-    peak = std::max<int32_t>(peak, std::abs(s));
-    const double sq = (double) s * s;
+    const int32_t a = s < 0 ? -s : s;
+    if (a > peak)
+      peak = a;
+    if (a >= 32000)
+      clipped++;
+    const uint64_t sq = (uint64_t) ((int64_t) s * s);
     sum_sq += sq;
     win_sq += sq;
     if ((i + 1) % window == 0) {
-      min_win_rms = std::min(min_win_rms, std::sqrt(win_sq / window));
-      win_sq = 0.0;
+      if (win_sq < min_win_sq)
+        min_win_sq = win_sq;
+      win_sq = 0;
     }
   }
-  const float rms = samples ? (float) std::sqrt(sum_sq / samples) : 0.0f;
+  const double min_win_rms = min_win_sq == UINT64_MAX ? 1e9 : std::sqrt((double) min_win_sq / window);
+  const float rms = samples ? (float) std::sqrt((double) sum_sq / samples) : 0.0f;
   const float noise = min_win_rms < 1e9 ? (float) min_win_rms : rms;
   ESP_LOGI(TAG, "Level (after gain_factor %d): peak %.1f dBFS, RMS %.1f dBFS, noise floor %.1f dBFS, SNR ~%.0f dB",
            this->gain_factor_, to_dbfs(peak), to_dbfs(rms), to_dbfs(noise),
            to_dbfs(rms) - to_dbfs(noise));
+  ESP_LOGI(TAG, "Clipped samples: %u of %u (%.2f %%)", (unsigned) clipped, (unsigned) samples,
+           samples ? 100.0f * clipped / samples : 0.0f);
 
   if (!this->normalize_ || peak == 0)
     return;
