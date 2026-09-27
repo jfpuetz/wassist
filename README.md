@@ -132,9 +132,20 @@ Für den Download braucht der Node HTTPS-Zugang ins Internet (github.io).
   Alternativ Button „Echo-Test starten“ ohne Wake Word. Danach Schalter wieder aus.
 - **LEDs:** „Status-LED“ und „Board-LED“ (Onboard-LED an GPIO48).
 
+## Wiedergabe aus Home Assistant
+
+Der Node erscheint in HA als Media Player **„WAssist Node 1 Lautsprecher“**:
+
+- **Text sprechen:** Aktion `tts.speak` mit `media_player_entity_id: media_player.wassist_node_1_lautsprecher`
+- **Durchsage** (mit Hinweiston, auch während Assist): Aktion `assist_satellite.announce` auf den Satelliten des Nodes
+- **Audiodatei / Radio:** Aktion `media_player.play_media` oder in HA unter *Medien* den Node als Ziel wählen
+
+HA wandelt alles in FLAC 16 kHz mono um (reicht für Sprache; Musik klingt entsprechend einfach).
+
 ## Lautstärke
 
-Regler „Lautstärke“ (0–100 %, bleibt nach Neustart erhalten) und Schalter „Stumm“ in HA und Weboberfläche.
+Lautstärke und Stumm hält der Media Player (Regler in HA, bleibt nach Neustart erhalten).
+Regler „Lautstärke“ und Schalter „Stumm“ in der Weboberfläche steuern ihn mit.
 Tasten: kurz drücken = ±5 %, halten = wiederholt, beim Loslassen kurzer Piep in der neuen Lautstärke.
 „Lauter“ hebt eine Stummschaltung auf.
 

@@ -41,8 +41,36 @@ rtttl:
   on_finished_playback:
     - script.execute: apply_volume
 
+# --- Media Player ---
+# Macht den Node in Home Assistant zum Lautsprecher: TTS (tts.speak), Durchsagen
+# (assist_satellite.announce), Audiodateien/Streams (media_player.play_media).
+# HA wandelt alles per ffmpeg in FLAC 16 kHz mono um. Eine Pipeline für alles (kein Mixer nötig).
+# Der Media Player ist die einzige Stelle, die Lautstärke/Stumm hält und speichert.
+media_player:
+  - platform: speaker
+    id: player
+    name: Lautsprecher
+    announcement_pipeline:
+      speaker: amp
+      format: FLAC
+      num_channels: 1
+      sample_rate: 16000
+    task_stack_in_psram: true
+    volume_initial: 50%
+    volume_increment: 5%
+    on_volume:
+      # Regler in der Weboberfläche nachführen (Schutz gegen Schleifen)
+      - lambda: |-
+          const float pct = roundf(x * 100.0f);
+          if (!id(volume).has_state() || fabsf(id(volume).state - pct) > 0.5f)
+            id(volume).publish_state(pct);
+    on_mute:
+      - lambda: id(mute).publish_state(true);
+    on_unmute:
+      - lambda: id(mute).publish_state(false);
+
 # --- Lautstärke ---
-# Software-Lautstärke des I2S-Lautsprechers (dB-Kurve), gilt für Sprachausgabe, Testton und Echo-Test.
+# Regler und Stumm-Schalter für die Weboberfläche; sie steuern den Media Player.
 number:
   - platform: template
     id: volume
@@ -54,10 +82,16 @@ number:
     step: 5
     mode: slider
     optimistic: true
-    restore_value: true
+    restore_value: false
     initial_value: 50
     on_value:
-      - script.execute: apply_volume
+      - if:
+          condition:
+            lambda: return fabsf(id(player).volume * 100.0f - x) > 0.5f;
+          then:
+            - media_player.volume_set:
+                id: player
+                volume: !lambda return x / 100.0f;
 
 switch:
   - platform: template
@@ -65,11 +99,19 @@ switch:
     name: Stumm
     icon: mdi:volume-off
     optimistic: true
-    restore_mode: RESTORE_DEFAULT_OFF
+    restore_mode: DISABLED
     turn_on_action:
-      - lambda: id(amp).set_mute_state(true);
+      - media_player.mute: player
     turn_off_action:
-      - lambda: id(amp).set_mute_state(false);
+      - media_player.unmute: player
+
+esphome:
+  on_boot:
+    - priority: -100
+      then:
+        - lambda: |-
+            id(volume).publish_state(roundf(id(player).volume * 100.0f));
+            id(mute).publish_state(id(player).is_muted());
 
 # Physische Tasten: kurz = ±5 %, halten = wiederholen, beim Loslassen kurzer Piepton
 binary_sensor:
@@ -123,20 +165,18 @@ binary_sensor:
       - script.execute: volume_feedback
 
 script:
+  # rtttl überschreibt die Speaker-Lautstärke -> danach die des Media Players wiederherstellen
   - id: apply_volume
     mode: restart
     then:
-      - lambda: |-
-          const float v = id(volume).state / 100.0f;
-          id(beeper).set_gain(v);
-          id(amp).set_volume(v);
+      - lambda: id(amp).set_volume(id(player).volume);
 
   - id: play_tone
     mode: restart
     parameters:
       song: string
     then:
-      - lambda: id(beeper).set_gain(id(volume).state / 100.0f);
+      - lambda: id(beeper).set_gain(id(player).volume);
       - rtttl.play: !lambda return song;
 
   - id: volume_feedback
