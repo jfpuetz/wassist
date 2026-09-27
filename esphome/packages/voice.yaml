@@ -6,14 +6,13 @@ micro_wake_word:
     microphone: mic
     gain_factor: 4
   # Mehrere Modelle: in Home Assistant unter "Aktivierungswort" auswählbar.
+  # Jedes aktive Modell kostet dauerhaft Rechenzeit – bei drei Modellen lief der Ringpuffer über.
   # Eigene Modelle später z. B. als lokale Datei: model: wake_words/hey_wassist.json
   models:
     - model: okay_nabu
       id: okay_nabu
     - model: hey_jarvis
       id: hey_jarvis
-    - model: hey_mycroft
-      id: hey_mycroft
   on_wake_word_detected:
     - if:
         condition:
@@ -71,7 +70,6 @@ voice_assistant:
   media_player: player
   noise_suppression_level: 2
   auto_gain: 31dBFS
-  volume_multiplier: 2.0
   on_listening:
     - script.execute: led_listening
   on_stt_vad_end:

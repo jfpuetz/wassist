@@ -140,7 +140,7 @@ Der Node erscheint in HA als Media Player **„WAssist Node 1 Lautsprecher“**:
 - **Durchsage** (mit Hinweiston, auch während Assist): Aktion `assist_satellite.announce` auf den Satelliten des Nodes
 - **Audiodatei / Radio:** Aktion `media_player.play_media` oder in HA unter *Medien* den Node als Ziel wählen
 
-HA wandelt alles in FLAC 16 kHz mono um (reicht für Sprache; Musik klingt entsprechend einfach).
+HA wandelt alles in FLAC 48 kHz mono um; ein Resampler vor dem Verstärker passt alle Quellen an.
 
 ## Lautstärke
 

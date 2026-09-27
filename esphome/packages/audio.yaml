@@ -1,6 +1,9 @@
 # Audio: zwei getrennte I2S-Busse.
 #   I2S0 -> Mikrofon INMP441 (-U4), L/R an Masse = linker Kanal
 #   I2S1 -> Verstärker MAX98357A (-U3), SD an VIN = linker Kanal, GAIN offen = 9 dB
+#
+# Tonweg:  Media Player / Sprachantworten / Echo-Test  ->  amp (Resampler)  ->  amp_hw (I2S, 48 kHz)
+# Der Resampler passt jede Quelle (16 kHz Echo, 48 kHz Media) an den festen I2S-Takt an.
 
 i2s_audio:
   - id: i2s_mic_bus
@@ -23,28 +26,24 @@ microphone:
 
 speaker:
   - platform: i2s_audio
-    id: amp
+    id: amp_hw
     i2s_audio_id: i2s_amp_bus
     i2s_dout_pin: ${amp_din}
     dac_type: external
     channel: mono
-    sample_rate: 16000
+    sample_rate: 48000
     bits_per_sample: 16bit
+    buffer_duration: 100ms
 
-# Soundtest: kurze Tonfolge über Verstärker und Lautsprecher
-# ACHTUNG: rtttl setzt beim Abspielen die Lautsprecher-Lautstärke auf seinen eigenen "gain".
-# Deshalb vor jedem Ton gain = Lautstärke-Regler und danach die Lautstärke wiederherstellen.
-rtttl:
-  id: beeper
-  speaker: amp
-  gain: 50%
-  on_finished_playback:
-    - script.execute: apply_volume
+  - platform: resampler
+    id: amp
+    output_speaker: amp_hw
+    task_stack_in_psram: true
 
 # --- Media Player ---
 # Macht den Node in Home Assistant zum Lautsprecher: TTS (tts.speak), Durchsagen
 # (assist_satellite.announce), Audiodateien/Streams (media_player.play_media).
-# HA wandelt alles per ffmpeg in FLAC 16 kHz mono um. Eine Pipeline für alles (kein Mixer nötig).
+# HA wandelt alles per ffmpeg in FLAC 48 kHz mono um. Eine Pipeline für alles (kein Mixer nötig).
 # Der Media Player ist die einzige Stelle, die Lautstärke/Stumm hält und speichert.
 media_player:
   - platform: speaker
@@ -54,10 +53,16 @@ media_player:
       speaker: amp
       format: FLAC
       num_channels: 1
-      sample_rate: 16000
+      sample_rate: 48000
     task_stack_in_psram: true
     volume_initial: 50%
     volume_increment: 5%
+    # Eingebaute Töne (WAV 48 kHz mono), laufen über den Media Player und damit mit dessen Lautstärke
+    files:
+      - id: snd_beep
+        file: sounds/beep.wav
+      - id: snd_test
+        file: sounds/testton.wav
     on_volume:
       # Regler in der Weboberfläche nachführen (Schutz gegen Schleifen)
       - lambda: |-
@@ -126,7 +131,7 @@ binary_sensor:
         pullup: true
       inverted: true
     filters:
-      - delayed_on_off: 20ms
+      - delayed_on_off: 30ms
     on_press:
       - switch.turn_off: mute
       - while:
@@ -151,7 +156,7 @@ binary_sensor:
         pullup: true
       inverted: true
     filters:
-      - delayed_on_off: 20ms
+      - delayed_on_off: 30ms
     on_press:
       - while:
           condition:
@@ -165,34 +170,23 @@ binary_sensor:
       - script.execute: volume_feedback
 
 script:
-  # rtttl überschreibt die Speaker-Lautstärke -> danach die des Media Players wiederherstellen
-  - id: apply_volume
-    mode: restart
-    then:
-      - lambda: id(amp).set_volume(id(player).volume);
-
-  - id: play_tone
-    mode: restart
-    parameters:
-      song: string
-    then:
-      - lambda: id(beeper).set_gain(id(player).volume);
-      - rtttl.play: !lambda return song;
-
   - id: volume_feedback
     mode: restart
     then:
-      # Kein Piep, wenn gerade gesprochen oder abgespielt wird
+      # Kurz warten, damit schnelles Mehrfachdrücken nur einen Piep auslöst;
+      # kein Piep, während gesprochen oder etwas abgespielt wird
+      - delay: 250ms
       - if:
           condition:
             and:
               - not:
                   voice_assistant.is_running:
               - lambda: return !id(echo).is_busy();
+              - media_player.is_idle: player
           then:
-            - script.execute:
-                id: play_tone
-                song: "vol:d=16,o=6,b=200:c"
+            - media_player.speaker.play_on_device_media_file:
+                media_file: snd_beep
+                announcement: true
 
 button:
   - platform: template
@@ -200,6 +194,6 @@ button:
     icon: mdi:volume-high
     entity_category: diagnostic
     on_press:
-      - script.execute:
-          id: play_tone
-          song: "wassist:d=8,o=5,b=160:c,e,g,c6,4p,c6,g,e,4c"
+      - media_player.speaker.play_on_device_media_file:
+          media_file: snd_test
+          announcement: true
